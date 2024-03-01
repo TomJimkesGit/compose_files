@@ -1,6 +1,6 @@
 ---
 #Change passwords to actual values when deployed.
-version: "2"
+version: "4"
 services:
   bookstack:
     image: lscr.io/linuxserver/bookstack
@@ -8,7 +8,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - APP_URL=http://pi4.local:6875
+      - APP_URL=http://10.0.20.13:6875
       - DB_HOST=bookstack_db
       - DB_USER=bookstack
       - DB_PASS=bookstack
@@ -27,7 +27,7 @@ services:
       - PUID=1000
       - PGID=1000
       - MYSQL_ROOT_PASSWORD=bookstackroot
-      - TZ=Europe/Warsaw
+      - TZ=Europe/Amsterdam
       - MYSQL_DATABASE=bookstackapp
       - MYSQL_USER=bookstack
       - MYSQL_PASSWORD=bookstack
@@ -49,3 +49,17 @@ services:
       - 6876:80
       - 6877:443
     restart: unless-stopped
+  heimdall_media_center:
+    image: lscr.io/linuxserver/heimdall:latest
+    container_name: heimdall_media_center
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /host/heimdall_media_center/config:/config
+    ports:
+      - 6878:80
+      - 6879:443
+    restart: unless-stopped
+
