@@ -3,7 +3,8 @@
 version: "4"
 services:
   bookstack:
-    image: lscr.io/linuxserver/bookstack
+    image: lscr.io/linuxserver/bookstack:latest
+#:amd64-25.01.24
     container_name: bookstack
     environment:
       - PUID=1000
@@ -14,7 +15,7 @@ services:
       - DB_PASS=bookstack
       - DB_DATABASE=bookstackapp
     volumes:
-      - /host/bookstack/bookstackdata:/config
+      - /mnt/nvme/config/bookstack/bookstackdata:/config
     ports:
       - 6875:80
     restart: unless-stopped
@@ -32,12 +33,12 @@ services:
       - MYSQL_USER=bookstack
       - MYSQL_PASSWORD=bookstack
     volumes:
-      - /host/bookstack/bookstackdbdata:/config
+      - /mnt/nvme/config/bookstack/bookstackdbdata:/config
     ports:
       - 3306:3306
     restart: unless-stopped
   heimdall:
-    image: lscr.io/linuxserver/heimdall:latest
+    image: lscr.io/linuxserver/heimdall:2.6.1
     container_name: heimdall
     environment:
       - PUID=1000
@@ -50,16 +51,29 @@ services:
       - 6877:443
     restart: unless-stopped
   heimdall_media_center:
-    image: lscr.io/linuxserver/heimdall:latest
+    image: lscr.io/linuxserver/heimdall:2.6.1
     container_name: heimdall_media_center
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - /host/heimdall_media_center/config:/config
+      - /mnt/nvme/config/heimdall_media_center/config:/config
     ports:
       - 6878:80
       - 6879:443
     restart: unless-stopped
-
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:2024.02.2
+    ports:
+      - "5353:53/tcp"
+      - "5353:53/udp"
+      - "8888:80/tcp"
+    environment:
+      TZ: 'Europe/Amsterdam'
+      WEBPASSWORD: 'CHANGEME'
+    volumes:
+      - '/mnt/nvme/config/pihole/etc-pihole:/etc/pihole'
+      - '/mnt/nvme/config/pihole/etc-dnsmasq.d:/etc/dnsmasq.d'
+    restart: unless-stopped
